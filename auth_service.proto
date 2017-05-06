@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package = "github.com/lileio/auth_service";
+import "github.com/lileio/account_service/account_service.proto";
+
+package auth_service;
+
+message AuthRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string token = 1;
+  account_service.Account account = 2;
+}
+
+service AuthService {
+  rpc Authenticate (AuthRequest) returns (AuthResponse) {}
+  /* rpc Validate (DeleteRequest) returns (DeleteResponse) {} */
+  /* rpc Delete (DeleteRequest) returns (DeleteResponse) {} */
+}
