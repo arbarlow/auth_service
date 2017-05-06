@@ -17,18 +17,14 @@ func (s Server) Authenticate(ctx context.Context, r *auth_service.AuthRequest) (
 	}
 	res, err := as.AuthenticateByEmail(ctx, &req)
 	if err != nil {
-		return nil, grpc.Errorf(
-			codes.PermissionDenied,
-			"authentication incorrect: %s",
-			err)
+		return nil, grpc.Errorf(codes.PermissionDenied,
+			"authentication incorrect: %s", err)
 	}
 
 	t, err := NewToken(res.Id)
 	if err != nil {
-		return nil, grpc.Errorf(
-			codes.Internal,
-			"jwt signing error: %s",
-			err)
+		return nil, grpc.Errorf(codes.Internal,
+			"jwt signing error: %s", err)
 	}
 
 	ar := auth_service.AuthResponse{
