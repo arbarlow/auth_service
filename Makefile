@@ -5,7 +5,7 @@ proto:
 	protoc -I $$GOPATH/src/ -I . auth_service.proto --lile-server_out=. --go_out=plugins=grpc:$$GOPATH/src
 
 test:
-	SIGNING_KEY="sometestkey" go test -v ./...
+	SIGNING_TOKEN="somesecuretesttoken" go test -v ./...
 
 benchmark:
 	go test -bench=. -benchmem -benchtime 10s

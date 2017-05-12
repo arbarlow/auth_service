@@ -1,5 +1,6 @@
 syntax = "proto3";
 option go_package = "github.com/lileio/auth_service";
+import "google/protobuf/empty.proto";
 import "github.com/lileio/account_service/account_service.proto";
 
 package auth_service;
@@ -14,8 +15,11 @@ message AuthResponse {
   account_service.Account account = 2;
 }
 
+message ValidateRequest {
+  string token = 1;
+}
+
 service AuthService {
   rpc Authenticate (AuthRequest) returns (AuthResponse) {}
-  /* rpc Validate (DeleteRequest) returns (DeleteResponse) {} */
-  /* rpc Delete (DeleteRequest) returns (DeleteResponse) {} */
+  rpc Validate (ValidateRequest) returns (google.protobuf.Empty) {}
 }

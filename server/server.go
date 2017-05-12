@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -25,17 +26,27 @@ type JWTClaims struct {
 }
 
 var (
-	as         account_service.AccountServiceClient
-	signingKey string
+	as          account_service.AccountServiceClient
+	signingKey  string
+	tokenExpiry time.Duration
 )
 
 func init() {
-	key := os.Getenv("SIGNING_KEY")
-	if key == "" {
-		logrus.Fatal("no JWT signing key provided")
+	signingKey := os.Getenv("SIGNING_TOKEN")
+	if signingKey == "" {
+		logrus.Fatal("no JWT signing token provided (SIGNING_TOKEN)")
 	}
 
-	signingKey = key
+	envDuration := os.Getenv("TOKEN_EXPIRY")
+	if envDuration == "" {
+		envDuration = "48h"
+	}
+
+	d, err := time.ParseDuration(envDuration)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	tokenExpiry = d
 }
 
 func NewServer() *lile.Server {
@@ -48,7 +59,6 @@ func NewServer() *lile.Server {
 	return lile.NewServer(
 		lile.Name("auth_service"),
 		lile.Implementation(impl),
-		lile.Publishers(map[string]string{}),
 	)
 }
 
@@ -60,13 +70,24 @@ func NewToken(account_id string) (string, error) {
 	claims := JWTClaims{
 		account_id,
 		jwt.StandardClaims{
-			ExpiresAt: 15000,
-			Issuer:    "auth_token_service",
+			ExpiresAt: time.Now().Add(tokenExpiry).Unix(),
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	return token.SignedString([]byte(signingKey))
+}
+
+func ValidateToken(token string) error {
+	_, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(signingKey), nil
+	})
+
+	return err
 }
 
 func AccountService() account_service.AccountServiceClient {
