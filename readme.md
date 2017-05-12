@@ -1,5 +1,8 @@
 # Auth Service
 
+[![Build Status](https://travis-ci.org/lileio/auth_service.svg?branch=master)](https://travis-ci.org/lileio/auth_service) [![GoDoc](https://godoc.org/github.com/lileio/auth_service?status.svg)](https://godoc.org/github.com/lileio/auth_service)
+
+
 Auth Service provides a simple gRPC service used to create and validate JWT tokens using
 accounts created with the [account service](https://github.com/lileio/account_service)
 
