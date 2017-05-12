@@ -3,9 +3,11 @@
 Auth Service provides a simple gRPC service used to create and validate JWT tokens using
 accounts created with the [account service](https://github.com/lileio/account_service)
 
-``` proto
+``` protobuf
+service AuthService {
   rpc Authenticate (AuthRequest) returns (AuthResponse) {}
   rpc Validate (ValidateRequest) returns (google.protobuf.Empty) {}
+}
 ```
 
 ## Configuration
